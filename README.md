@@ -557,28 +557,849 @@ obj_ptr = &obj;
 
 Виртуальную функцию не обязательно определять в классе наследнике. В этом случае вызывается функция, определенная в базовом классе.
 
-## 31 Чисто виртуальные функции и абстрактные классы
+### 31. Чисто виртуальные функции и абстрактные классы.
 
+Итак, если виртуальная функция не замещается в производном классе, вызывается ее версия из базового класса. Однако во многих случаях невозможно создать разум­ную версию виртуальной функции в базовом классе. Например, базовый класс может не обладать достаточным объемом информации для создания виртуальной функции. Кроме того, в некоторых ситуациях необходимо гарантировать, что виртуальная функция будет замещена во всех производных классах. Для этих ситуаций в языке C++ предусмотрены чисто виртуальные функции.
 
+*Чисто виртуальная функция* (pure virtual function) — это виртуальная функция, не
+имеющая определения в базовом классе.
 
-## 32.	Перегрузка функций.
-## 33.	Перегрузка унарных операторов.
-## 34.	Перегрузка бинарных операторов.
-## 35.	Перегрузка оператора индексации массивов [ ]
-## 36.	Аргументы, передаваемые функции по умолчанию.
-## 37.	Определение адреса перегруженной функции.
-## 38.	Класс vector.
-## 39.	Класс string.
-## 40.	Класс map и multimap.
-## 41.	Объявление элементов класса спецификацией static.
-## 42.	Объявление элементов класса спецификацией const.
-## 43.	Шаблон функции.
-## 44.	Шаблон класса.
-## 45.	Контейнеры и итераторы.
-## 46.	Контейнер – динамический массив.
-## 47.	Контейнер – ассоциативный список.
-## 48.	Исключительные ситуации.
-## 49.	Приведение типов.
-## 50.	Сигналы и обработчики.
-## 51.	Ввод-вывод в С++. Потоки.
-## 52.	Форматированный ввод-вывод данных.
+**Чисто виртуальные функции должны переопределяться в каждом производном классе, в противном случае возникнет ошибка компиляции.**
+
+Синтаксис: `virtual void make_sound() const = 0;`
+
+- Пример
+    
+    ```cpp
+    class Animal
+    {
+        std::string species;
+    public:
+        Animal(std::string);
+        Animal(const char*);
+        virtual void make_sound() const = 0;
+        ~Animal();
+    };
+    
+    class Wolf : public Animal
+    {
+    public:
+        Wolf();
+        void make_sound() const;
+    };
+    
+    Animal::Animal(std::string _species): species(_species) {}
+    
+    Animal::Animal (const char* _species): species(_species) {}
+    
+    void Animal::make_sound() const
+    {
+        std::cout << "Moo?.." << std::endl;
+    }
+    
+    Animal::~Animal() {}
+    
+    Wolf::Wolf(): Animal("wolf") {}
+    
+    void Wolf::make_sound() const
+    {
+        std::cout << "Woof! Woof!" << std::endl;
+    }
+    
+    void trigger_make_sound(const Animal& animal)
+    {
+        animal.make_sound();
+    }
+    ```
+    
+
+**Абстрактные классы**
+
+Класс, содержащий хотя бы одну чисто виртуальную функцию, называется *абст­рактным* (abstract class). Поскольку абстрактный класс содержит одну или несколько
+функций, не имеющих определения (т.е. чисто виртуальные функции), **его объекты
+создать невозможно**. Следовательно, абстрактные классы можно использовать лишь как основу для производных классов.
+
+Несмотря на то что объекты абстрактного класса не существуют, можно создать
+указатели и ссылки на абстрактный класс. Это позволяет применять абстрактные классы для поддержки динамического полиморфизма и выбирать соответствующую виртуальную функцию в зависимости от типа указателя или ссылки.
+
+### 32. Перегрузка функций.
+
+*Перегрузка функций* — это использование одного имени для нескольких функций.
+
+При перегрузке каждое переопределение функции должно использовать либо другие типы параметров, либо другое их количество.
+
+**Конструкторы можно перегружать.**
+
+### 33. Перегрузка унарных операторов.
+
+```cpp
+class Vec
+{
+    double x, y;
+public:
+    Vec(): x(0), y(0) {}
+    Vec(int _x, int _y): x(_x), y(_y) {}
+    double get_x() const { return x; }
+    double get_y() const { return y; }
+    Vec& operator++()
+    {
+        x += 1;
+        y += 1;
+
+        return *this;
+    }
+    Vec& operator++(int)
+    {
+        x += 1;
+        y += 1;
+
+        return *this;
+    }
+};
+```
+
+постфиксный и префиксный инкременты перегружены одинаково.
+
+`operator++(int)` - `int` здесь - затычка, чтобы отличить постфикс от префикса.
+
+### 34. Перегрузка бинарных операторов.
+
+```cpp
+Vec operator+(const Vec& v2) const
+{
+    return Vec(x + v2.x, y + v2.y);
+}
+Vec operator+=(const Vec& v2)
+{
+    x += v2.x;
+    y += v2.y;
+
+    return *this;
+}
+
+Vec vec1(11, 12);
+Vec vec2(5, -9);
+
+Vec vec3 = vec1 + vec2;
+```
+
+### 35. Перегрузка оператора индексации массивов `[]`
+
+```cpp
+class Array
+{
+    int* arr;
+    size_t size;
+public:
+    Array(size_t n);
+    Array(const Array&);
+    int& operator[](size_t);
+    void operator()();
+    ~Array();
+};
+
+Array::Array(size_t n): size(n)
+{
+    arr = new int[size];
+}
+
+Array::Array(const Array& arr2)
+{
+    arr = new int[arr2.size];
+
+    for (size_t i = 0; i < arr2.size; i++)
+        arr[i] = arr2.arr[i];
+}
+
+Array::~Array()
+{
+    delete[] arr;
+}
+
+int& Array::operator[](size_t pos)
+{
+    return arr[pos];
+}
+```
+
+### 36. Аргументы, передаваемые функции по умолчанию.
+
+```cpp
+void print_labeled_arr(
+	const int* arr,
+	const size_t size,
+	const char* msg = "Hello, World!")
+{
+	std::cout << msg << std::endl;
+
+	for (size_t i = 0; i < size; i++)
+		std::cout << arr[i] << " ";
+}
+```
+
+### 37. Определение адреса перегруженной функции.
+
+Функция имеет адрес. Этот адрес можно присвоить указателю, а затем вызывать функцию не по имени, а через ее указатель.
+
+Если функция `myfunc()` не перегружена, она существует в одном экземпляре, и компи­лятор без труда вычисляет ее адрес. Однако, если функция `myfunc()` перегружена, воз­никает вопрос, каким образом компилятор может вычислить ее указатель? Ответ зави­сит от того, как объявлен указатель `р`.
+
+```cpp
+int myfunc(int);
+int myfunc(int, int);
+
+int main()
+{
+    int (*fp)(int, int);
+    
+    fp = myfunc;
+
+    std::cout << fp(5, 3) << std::endl; // 15
+
+    return 0;
+}
+
+int myfunc(int a)
+{
+    return a;
+}
+
+int myfunc(int a, int b)
+{
+    return a * b;
+}
+```
+
+### 38. Класс `vector`.
+
+`std::vector<T>` — динамический массив.
+
+- `begin`, `end`, `rbegin`, `rend
+cbegin`, `cend`, `crbegin`, `crend`
+- `push_back`, `pop_back`
+- `at(size_t i)` — возвращает ссылку на i-ый элемент
+- `back` — возвращает ссылку на последний элемент
+- `size_t capacity() const` — возвращает число элементов, которое вектор может содержать без выделения дополнительного пространства.
+- `size()` — Возвращает количество элементов в векторе.
+- `clear()`
+- `empty()`
+- `erase()` — Удаляет элемент или диапазон элементов в векторе из заданных позиций.
+итератор или итераторы  begin-end `[it_beg; it_end)`
+- `insert()` — вставляет элемент или несколько элементов или диапазон элементов в указанную позиции в вектор.
+
+### 39. [Класс](https://docs.microsoft.com/ru-ru/cpp/standard-library/basic-string-class?view=msvc-170#append) `[string](https://docs.microsoft.com/ru-ru/cpp/standard-library/basic-string-class?view=msvc-170#append)`.
+
+- `size()`/`length()`
+- `c_str()` — возвращает строку, преобразованную в C-строку
+- `starts_with()`/`ends_with()`
+- `std::string substr(size_t offset = 0, size_t count = npos)` — Копирует из указанного положения в строке подстроку, содержащую по крайней мере несколько символов
+    
+    ```cpp
+    std::string s = "Hello, World!123 12 3123 123 123 3 123123 123";
+        std::cout << s.substr(0, 13) << std::endl; // Hello, World!
+    ```
+    
+- `find`/`rfind`
+    
+    ```cpp
+    std::string s = "Hello, World!123 12 3123 123 123 3 123123 123";
+    
+    size_t pos = s.find("World");
+    size_t pos_end = s.find_last_of("World");
+    
+    std::cout << pos << " "  << pos_end << std::endl; // 7 11
+    ```
+    
+- `copy(char* c, size_t n, size_t offset = 0) const` — копирует часть строки в `c`
+- `replace()` — заменяет элементы в строке в указанной позиции заданными символами или символами, скопированными из других диапазонов, строк или C-строк.
+- `append()` - добавляет символы в конец строки
+- `erase()` - удаляет элемент или диапазон элементов с указанного положения в строке
+
+```cpp
+iterator erase(
+    iterator first,
+    iterator last);
+
+iterator erase(
+    iterator iter);
+
+basic_string<CharType, Traits, Allocator>& erase(
+    size_type offset = 0,
+    size_type count = npos);
+```
+
+- `find_last_of` — Выполняет в строке поиск последнего символа, совпадающего с любым элементом заданной строки.
+- `capacity()`
+- `static const size_type npos = -1` — целочисленное значение без знака, инициализированное значением -1, которое указывает на отсутствие найденных или всех оставшихся символов при сбое функции поиска.
+
+### 40. Класс `map` и `multimap`.
+
+`std::map<K, V>` — ассоциативный массив, хранящий значения типа `V` по ключам типа `K`.
+
+- те же методы, что и у `multimap`
+
+`std::multimap<K, V>` — *мультиотображение* — множество, в которое каждый элемент может входить несколько раз
+
+```cpp
+#include <map>
+#define int_pair std::pair<int, int>
+
+template <typename K, typename V>
+void show(const std::multimap<K, V>& mm)
+{
+    for (typename std::multimap<K, V>::const_iterator it = mm.begin(); it != mm.end(); it++)
+        std::cout << it->first << " " << it->second << std::endl;
+}
+```
+
+- `multimap::begin()`, `multimap::end()` — возвращает итератор, адресующий первый элемент в мультиотображении.
+- `rbegin`, `rend`
+- `multimap::cbegin()`, `multimap::cend()` — возвращает константный итератор, адресующий первый элемент в мультиотображении.
+- `crbegin`, `crend`
+- `multimap::insert(std::pair)` — вставляет в мультиотображение пару ключ-значение, представляемую парой `std::pair<K, V>`.
+- `multimap::count(const K&)` — возвращает число элементов в мультиотображении, ключи которых совпадают с ключом, заданным параметром.
+- `bool multimap::contains(const &K)` — проверяет, существует ли элемент с указанным ключом в `multimap`
+- `multimap::empty()` — проверяет, что мультиотображение пусто — возвращает **`true`**, если `multimap` пусто; **`false` е**сли `multimap` не является пустым.
+- `multimap::clear()` — удаляет все элементы мультиотображения
+- `multimap::size()` — возвращает размер мультиотображения
+- `multimap::find(const K&)` — возвращает итератор, ссылающийся на элемент в мультикарте, ключ которого эквивалентен заданному ключу.
+- `multimap::erase(const_iterator Where)`/`multimap::erase(const_iterator First, const_iterator Second)`/`multimap::erase(const K&)`
+- `multimap::equal_range` — Находит диапазон элементов, где ключ элемента соответствует заданному значению.
+
+```cpp
+pair<const_iterator, const_iterator> equal_range (const Key& key) const;
+
+pair<iterator, iterator> equal_range (const Key& key);
+```
+
+### 41. Объявление элементов класса спецификацией `static`.
+
+Члены класса могут быть статическими.
+
+Независимо от количества объектов класса, статическая переменная всегда существует в одном экземпляре.
+
+Объявление статической переменной-члена в классе не означает ее *определения*
+(иначе говоря, память для нее не выделяется). Чтобы разместить статическую переменную в памяти, следует определить ее вне класса, т.е. глобально. (строка `int Shared::n = 0` необходима)
+
+```cpp
+class Shared
+{
+    static int n;
+    int b;
+public:
+    void increment() const;
+    static void show();
+};
+
+int Shared::n; // int Shared::n = 0;
+void Shared::increment() const
+{
+    Shared::n++;
+}
+void Shared::show()
+{
+    std::cout << Shared::n << std::endl;
+}
+
+int main()
+{
+    Shared o;
+    Shared::show();
+    o.increment();
+    Shared::show();
+
+    return 0;
+}
+```
+
+```cpp
+class Counter
+{
+public:
+    static int count;
+    Counter() { count++; }
+    ~Counter() { count--; }
+};
+
+int Counter::count = 0;
+```
+
+### 42. Объявление элементов класса спецификацией `const`.
+
+Если объявить поле класса со спецификацией `const`, при создании каждого нового объекта будет выделяться память для хранения значения переменной, которая представляет это поле класса.
+
+Если объявить статическое поле класса со спецификацией `const`, при определении (определять нужно явно) поля память для хранения значения выделится единожды, далее значение нельзя будет изменить.
+
+```cpp
+class Counter
+{
+public:
+    static const int count;
+};
+
+const int Counter::count = 15;
+```
+
+Если объявить метод-член класса со спецификацией `const`, в методе нельзя будет изменить значения полей класса или вызвать методы, делающие это:
+
+```cpp
+class Counter
+{
+    int count;
+public:
+    Counter(int n = 0): count(n) {}
+    int increment() { return ++count; }
+    void show() const { std::cout << count << std::endl; }
+    ~Counter() {}
+};
+```
+
+### 43. Шаблон функции.
+
+Шаблон функции (обобщенная функция) позволяет определять функцию для многих типов данных.
+
+```cpp
+template <typename T>
+void print_arg(T arg)
+{
+	std::cout << arg << std::endl;
+}
+```
+
+Явная перегрузка шаблонной функции
+
+```cpp
+
+void print_arg(double arg)
+{
+	std::cout << "Printing 'double' type value": arg << std::endl;
+}
+```
+
+---
+
+Ограничения на обобщенные функции
+
+Обобщенные функции напоминают перегруженные, но на них налагаются еще бо­лее жесткие ограничения. При перегрузке внутри тела каждой функции можно вы­полнять разные операции. В то же время обобщенная функция должна выполнять од­ну и ту же универсальную операцию для всех версий, различаться могут лишь типы данных.
+
+### 44. Шаблон класса.
+
+Шаблон класса (обобщенный класс) позволяет определять класс для многих типов данных.
+
+Обобщенный класс — класс, в котором определены все алгоритмы, однако фактический тип дан­ных задается в качестве параметра при создании объекта. Обобщенные классы оказываются полезными, если логика класса не зависит от типа данных.
+
+```cpp
+template <typename T>
+class Stack
+{
+    T* stack;
+    size_t size;
+public:
+    Stack(size_t _size);
+    bool pop(T& into);
+    bool push(const T& val);
+    size_t max_size() const;
+    size_t cur_size() const;
+};
+
+template <typename T>
+Stack<T>::Stack(size_t _size): size(_size) {}
+```
+
+**Применение стандартных типов в обобщенных классах**
+
+```cpp
+template <typename T, int size>
+class Stack
+{
+    T stack[size];
+    size_t max_size;
+public:
+    Stack();
+    bool pop(T& into);
+    bool push(const T& val);
+    size_t get_max_size() const;
+    size_t get_cur_size() const;
+};
+
+template <typename T, int size>
+Stack<T, size>::Stack()
+{
+    max_size = size;
+}
+```
+
+**Применение аргументов по умолчанию в шаблонных классах**
+
+```cpp
+template <typename T = int>
+class myclass { /* ... */ }
+```
+
+**Явная специализация класса**
+
+```cpp
+template <typename T> class myclass {}
+
+// Явная специализация класса
+template <> class myclass<int> {} 
+```
+
+### 45. Контейнеры и итераторы.
+
+Основные контейнеры:
+
+- `std::vector`
+- `std::list`
+- `std::set`
+- `std::map`
+- `std::queue`
+
+Итераторы STL-контейнеров:
+
+- `begin`, `end`, `rbegin`, `rend`
+- `cbegin`, `cend`, `crbegin`, `crend`
+
+### 46. Контейнер – динамический массив.
+
+Это есть `std::vector`
+
+### 47. Контейнер – ассоциативный список.
+
+Есть `std::map`
+
+### 48. Исключительные ситуации.
+
+Оператор `throw` позволяет сгенерировать исключительную ситуацию.
+
+```cpp
+struct MyException
+{
+	MyException(const char* message): _message(message) {}
+	const char* what() const
+	{
+		return _message;
+	}
+private:
+	const char* _message;
+};
+
+int main()
+{
+    try {
+        throw MyException("foobar");
+    } catch (const MyException& e)
+    {
+       std::cout << "Caught custom exception!" << std::endl
+        << e.what() << std::endl; 
+    }
+    return 0;
+}
+```
+
+Если в программе предусмотрен ее перехват, оператор `throw` должен выполняться либо внутри блока `try` , либо внутри функции, явно или неявно вызываемой внутри блока `try`.
+
+Синтаксис `try`/`catch`
+
+```cpp
+try {
+	// ...
+}
+catch (const typeone& arg) {
+	// ...
+}
+catch (const typetwo& arg) {
+	// ...
+}
+// ...
+catch (const typeN& arg) {
+	// ...
+}
+```
+
+**блок обрабатывает все ошибки** (можно добавлять после блоков `catch`, обрабатывающих какие-либо типы аргументов:
+
+```cpp
+try {
+	// ...
+}
+catch (...) {
+	// ... handles any errors or unhandled errors
+}
+```
+
+> ❗ Оператор `catch`, соответствующий базовому классу, одновременно соответствует и всем производным классам.
+> 
+
+---
+
+**Ограничение исключительных ситуаций**
+
+Можно ограничить типы исключительных ситуаций, которые может генерировать функция:
+
+```cpp
+template <typename T>
+class MyArray
+{
+    T* arr;
+		size_t capacity = 5;
+    size_t cur_size = 2;
+public:
+    T& operator[](size_t pos) const throw(IndexOutOfRangeException);
+};
+
+template <typename T>
+T& MyArray<T>::operator[](size_t pos) const throw(IndexOutOfRangeException) {
+	if (pos >= cur_size)
+		throw IndexOutOfRangeException("");
+  throw "";
+	return arr[pos];
+}
+```
+
+Если запросить элемент, находящийся по индексу, не существующему в массиве, возникнет ошибка, перехватив которую продолжится выполнение программы.
+
+Если же этой ошибки не возникнет, перегруженный оператор `[]` сгенерирует *неожиданное* исключение типа `const char*`, из-за которого, вне зависимости от обработки исключений, программа аварийно завершится ( на самом деле попытка сгенерировать исключительную ситуацию, не поддерживаемую функ­цией, сопровождается вызовом стандартной функции `unexpected()`. Затем по умолчанию вызывается функция `abort()`, и программа завершается аварийно.).
+
+Если необходимо запретить функции вообще генерировать *любые* исключительные си­туации, список типов следует оставить пустым:
+
+```cpp
+template<typename T>
+void MyArray<T>::print_array() const throw()
+{
+	for (size_t i = 0; size_t < capacity; i++)
+	{
+		if (i)
+			std::cout << " ";
+		std::cout << arr[i];
+	}
+	std::cout << std::endl;
+}
+```
+
+### 49. Приведение типов.
+
+ В C++ для поддержки объектно-ориентированного программирования используется динамическая идентификация типа (RTTI - Run-Time Type Identification).
+
+Оператор `typeid` возвращает ссылку на объект типа `type_info`, у которого определены операции `==`, `!=`, а также у которого есть метод `name`, возвращающий указатель `const char*` на имя объекта.
+
+---
+
+В языке C++ существуют пять операторов приведения типов. Первый оператор является вполне традиционным и унаследован от языка С. Остальные четыре были добавлены впоследствии. К ним относятся операторы `dynamic_cast`, `const_cast`, `reinterpret_cast` и `static_cast`. Эти операторы позволяют полнее контролиро­вать процессы приведения типов.
+
+---
+
+**Стандартное приведение типов**:
+
+```cpp
+void* arr = (float*)(malloc(size * sizeof(float)));
+```
+
+**`dynamic_cast`**
+
+Осуществляет динамическое приведение типа с последующей про­веркой корректности приведения. Если приведение оказалось некорректным, оно не выполняется.
+
+Результирующий тип должен быть указательным или ссылочным, а приводимое выражение - вычислять указатель или ссылку.
+
+```cpp
+dynamic_cast<target_type>(expression);
+```
+
+Оператор `dynamic_cast` ****предназначен для приведения полиморфных типов.
+
+До­пустим, даны два полиморфных класса `B` и `D`, причем класс `D` является производным
+от класса `B`. Тогда оператор `dynamic_cast` может привести указатель типа `D*` к ти­пу `B*`. Это возможно благодаря тому, что указатель на объект базового класса может ссылаться на объект производного класса. Однако обратное динамическое приведе­ние указателя типа `D*` к типу `B*` возможно лишь в том случае, если указатель дейст­вительно ссылается на объект класса `D`. Оператор `dynamic_cast` достигает цели, ес­ли указатель или ссылка, подлежавшие приведению, ссылаются на объект резуль­тирующего класса или объект класса, производного от результирующего. В противном случае приведение типов считается неудавшимся. В случае неудачи оператор `dynamic_cast`, примененный к указателям, возвращает нулевой указатель. Если оператор `dynamic_cast` применяется к ссылкам, в случае ошибки генерирует­ся исключительная ситуация `bad_cast`.
+
+Примеры приведения типов:
+
+```cpp
+class Base {
+public:
+    virtual void f() { std::cout << "Hello, World!\n"; }
+};
+class Derived: public Base {
+public:
+    void f() { std::cout << "Hello from Derived\n"; }
+};
+
+int main()
+{
+    Base b, *bp;
+    Derived d, *dp;
+
+    dp = dynamic_cast<Derived*>(&d); // то же, что и dp = &d
+
+    bp = dynamic_cast<Base*>(&d); // bp = &d
+
+    dp = dynamic_cast<Derived*>(bp);
+
+    if (dp) std::cout << "Конвертация успешна" << std::endl;
+
+    // указатель теперь ссылается на тип Base
+    dp = dynamic_cast<Derived*>(&b);
+
+    // 
+    if (dp == nullptr) std::cout << "Конвертация неудачна" << std::endl;
+
+    bp = &b;
+}
+```
+
+`**const_cast**`
+
+Оператор `const_cast` используется для явного замещения модификаторов `const` и/или `volatile`.
+
+```cpp
+void sqrval(const int* val)
+{
+    int *p = const_cast<int*>(val);
+
+    *p = *val * *val;
+}
+
+int main()
+{
+    int num = 10;
+
+    std::cout << num << std::endl; // 10
+
+    sqrval(&num);
+
+    std::cout << num << std::endl; // 100
+
+    return 0;
+}
+```
+
+`**reinterpret_cast**`
+
+Оператор преобразует один тип в совершенно другой.
+
+Например, указатель в `long`
+
+```cpp
+char num = 'B';
+char* p_num = &num;
+
+std::cout << reinterpret_cast<long>(p_num) << std::endl;
+```
+
+**`static_cast`**
+
+Оператор заменяет обычное приведение:
+
+```cpp
+int main()
+{
+	for (int i = 0; i < 10; i++)
+		std::cout << static_cast<double>(i) / 3 << " ";
+
+	return 0;
+}
+```
+
+### 50. Сигналы и обработчики.
+
+[Подробнее](https://unetway.com/tutorial/c-obrabotka-signalov)
+
+Сигналы - это прерывания, передаваемые процессу операционной системой, которые могут прервать программу преждевременно.
+
+Есть сигналы, которые не могут быть пойманы программой, но есть следующий список сигналов, которые вы можете поймать в своей программе и можете принимать соответствующие действия на основе сигнала. Эти сигналы определены в файле заголовка C++ `<csignal>`.
+
+- `SIGABRT` — Аномальное завершение программы, например, вызов **прерывания** .
+- `SIGFPE` — Ошибочная арифметическая операция, такая как деление на ноль или операция, приводящая к переполнению.
+- `SIGILL` — Обнаружение незаконной инструкции.
+- `SIGINT` — Получение сигнала интерактивного внимания.
+- `SIGSEGV` —Недействительный доступ к хранилищу.
+- `SIGTERM` — Запрос завершения, отправленный в программу.
+
+Библиотека управления сигналами `<csignal>` предоставляет `signal()` для обнаружения неожиданных событий:
+
+```cpp
+void (*signal (int sig, void (*func)(int)))(int);
+```
+
+```cpp
+#include <iostream>
+#include <csignal>
+#include <unistd.h>
+
+using namespace std;
+
+void signalHandler(int signum)
+{
+    cout << "Interrupt signal (" << signum << ") received.\n";
+
+    // cleanup and close up stuff here
+    // terminate program
+
+    exit(signum);
+}
+
+int main()
+{
+    // register signal SIGINT and signal handler
+    signal(SIGINT, signalHandler);
+
+    while (1)
+    {
+        cout << "Going to sleep...." << endl;
+        sleep(1);
+    }
+
+    return 0;
+}
+```
+
+---
+
+Функция `raise` позволяет генерировать сигналы прерывания:
+
+```cpp
+#include <iostream>
+#include <csignal>
+#include <unistd.h>
+
+using namespace std;
+
+void signalHandler(int signum)
+{
+    cout << "Interrupt signal (" << signum << ") received.\n";
+
+    // cleanup and close up stuff here
+    // terminate program
+
+    exit(signum);
+}
+
+int main()
+{
+    int i = 0;
+    // register signal SIGINT and signal handler
+    signal(SIGINT, signalHandler);
+
+    while (++i)
+    {
+        cout << "Going to sleep...." << endl;
+        if (i == 3)
+        {
+            raise(SIGINT);
+        }
+        sleep(1);
+    }
+
+    return 0;
+}
+```
+
+### 51. Ввод-вывод в С++. Потоки.
+
+Текстовый поток — это последовательность символов, к которым можно получить доступ. Со временем поток может производить или потреблять потенциально неограниченные объемы данных.
+
+В C++ для ввода и вывода используются потоки `cin` и `cout`.
+
+### 52. Форматированный ввод-вывод данных.
+
+Функции `printf()` и `scanf()` выполняют форматированный ввод-вывод на кон­соль, иначе говоря, они могут считывать и записывать данные в заданном формате.
+
+Также для форматирования можно использовать библиотеку `<iomanip>`.
+В ней есть такие манипуляторы потока вывода как `setw()`, `right`, `left` и др.
