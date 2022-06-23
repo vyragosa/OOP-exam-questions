@@ -11,7 +11,7 @@
 
 **Операцией** называется определенное воздействие одного объекта на другой, с целью вызвать соответствующую реакцию.
 
-## 2. Определение системы и три примера систем.
+## 2. Определение системы и три примера систем
 
 **Система** - множество взаимосвязанных и взаимодействующих объектов для решения одной или множества задач (достижения одной или множества целей).
 
@@ -557,7 +557,7 @@ obj_ptr = &obj;
 
 Виртуальную функцию не обязательно определять в классе наследнике. В этом случае вызывается функция, определенная в базовом классе.
 
-### 31. Чисто виртуальные функции и абстрактные классы.
+### 31. Чисто виртуальные функции и абстрактные классы
 
 Итак, если виртуальная функция не замещается в производном классе, вызывается ее версия из базового класса. Однако во многих случаях невозможно создать разум­ную версию виртуальной функции в базовом классе. Например, базовый класс может не обладать достаточным объемом информации для создания виртуальной функции. Кроме того, в некоторых ситуациях необходимо гарантировать, что виртуальная функция будет замещена во всех производных классах. Для этих ситуаций в языке C++ предусмотрены чисто виртуальные функции.
 
@@ -569,48 +569,48 @@ obj_ptr = &obj;
 Синтаксис: `virtual void make_sound() const = 0;`
 
 - Пример
-    
-    ```cpp
-    class Animal
-    {
-        std::string species;
-    public:
-        Animal(std::string);
-        Animal(const char*);
-        virtual void make_sound() const = 0;
-        ~Animal();
-    };
-    
-    class Wolf : public Animal
-    {
-    public:
-        Wolf();
-        void make_sound() const;
-    };
-    
-    Animal::Animal(std::string _species): species(_species) {}
-    
-    Animal::Animal (const char* _species): species(_species) {}
-    
-    void Animal::make_sound() const
-    {
-        std::cout << "Moo?.." << std::endl;
-    }
-    
-    Animal::~Animal() {}
-    
-    Wolf::Wolf(): Animal("wolf") {}
-    
-    void Wolf::make_sound() const
-    {
-        std::cout << "Woof! Woof!" << std::endl;
-    }
-    
-    void trigger_make_sound(const Animal& animal)
-    {
-        animal.make_sound();
-    }
-    ```
+  
+```cpp
+class Animal
+{
+    std::string species;
+public:
+    Animal(std::string);
+    Animal(const char*);
+    virtual void make_sound() const = 0;
+    ~Animal();
+};
+
+class Wolf : public Animal
+{
+public:
+    Wolf();
+    void make_sound() const;
+};
+
+Animal::Animal(std::string _species): species(_species) {}
+
+Animal::Animal (const char* _species): species(_species) {}
+
+void Animal::make_sound() const
+{
+    std::cout << "Moo?.." << std::endl;
+}
+
+Animal::~Animal() {}
+
+Wolf::Wolf(): Animal("wolf") {}
+
+void Wolf::make_sound() const
+{
+    std::cout << "Woof! Woof!" << std::endl;
+}
+
+void trigger_make_sound(const Animal& animal)
+{
+    animal.make_sound();
+}
+```
     
 
 **Абстрактные классы**
