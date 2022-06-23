@@ -1224,10 +1224,9 @@ std::cout << reinterpret_cast<long>(p_num) << std::endl;
 ```cpp
 int main()
 {
-	for (int i = 0; i < 10; i++)
-		std::cout << static_cast<double>(i) / 3 << " ";
-
-	return 0;
+    for (int i = 0; i < 10; i++)
+        std::cout << static_cast<double>(i) / 3 << " ";
+    return 0;
 }
 ```
 
@@ -1698,10 +1697,14 @@ class myclass { /* ... */ }
 template <typename T> class myclass {}
 
 // Явная специализация класса
-template <> class myclass<int> {} 
+template <> class myclass<int> 
+{
+
+} 
 ```
 
 ### 73. Шаблон функции
+
 Шаблон функции (обобщенная функция) позволяет определять функцию для многих типов данных.
 
 ```cpp
@@ -1727,3 +1730,394 @@ void print_arg(double arg)
 Ограничения на обобщенные функции
 
 Обобщенные функции напоминают перегруженные, но на них налагаются еще более жесткие ограничения. При перегрузке внутри тела каждой функции можно вы­полнять разные операции. В то же время обобщенная функция должна выполнять од­ну и ту же универсальную операцию для всех версий, различаться могут лишь типы данных.
+
+### 74. Почему следующие две перегруженные функции внутренне неоднозначны?
+
+```cpp
+int f ( int a ); //Внутри данной функции создается 
+                //локальная переменная и изменяется она локально, соответственно
+int f ( int & a ); //Функция получает на вход ссылку на переменную, и, соответственно,
+                //изменяется значение переменной по ссылке (а не локально, как в первом случае)
+```
+
+### 75. Почему следующая функция может не компилироваться как встраиваемая?
+
+Не хватает ключевого слова `inline`
+
+```cpp
+/*inline*/ void fl ( ) {
+    int i;
+    for( i = 0; i < 10; i++ ) 
+        cout << i;
+}
+```
+
+### 76. Что неправильно в данном фрагменте?
+
+```cpp
+int main ( ) {
+ . . . .
+ throw 12.23;
+}
+```
+
+```cpp
+int main ( ) {
+    try {
+        throw 12.23;
+    }
+    catch (double i) {
+        ///
+    }
+    return 0;
+}
+```
+
+### 77. Что неправильно в следующем прототипе функции?
+
+```cpp
+char * f ( char * p, int x = 0,  char * q );
+//Аргумент по умолчанию должен быть указан в конце списка параметров
+char * f ( char * p, char * q, int x = 0 );
+```
+
+### 78. Что неправильно в конструкторе, показанном в следующем фрагменте?
+
+```cpp
+class sample 
+    double a, b, с;
+public:
+    double sample ( );
+}
+```
+
+```cpp
+class sample 
+    double a, b, с;
+public:
+    sample ( );
+    //Конструктор объявляется без типа а точнее его тип это класс к которому он принадлежит
+}
+```
+
+### 79 Правилен ли следующий фрагмент?
+
+```cpp
+union /*name*/{
+    float f;
+    unsigned int bits;
+}; //должно быть название объединения и ';' после
+```
+
+### 80. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+#include <list>
+using namespace std;
+int main() {
+    list < char > lst;
+    list < char > ::iterator it_lst;
+    int i;
+    for (i = 0; i < 10; i++) lst.push_back('A' + i);
+    cout << "Size = " << lst.size() << endl;
+    cout << "lst: ";
+    while (!lst.empty()) {
+        it_lst = lst.end();
+        it_lst--;
+        cout << *it_lst;
+        lst.pop_back();
+    }
+    return 0;
+}
+```
+Вывод программы:
+
+`Size = 10`
+
+`lst: JIHGFEDCBA`
+
+### 81. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+class static_func_demo {
+    static int i;
+public:
+    static void init(int x) { i = x; }
+    void show() { cout << i; }
+};
+int static_func_demo::i;
+int main()
+{
+    static_func_demo::init(100);
+    static_func_demo x;
+    x.show();
+    return 0;
+}
+```
+
+Вывод: `100`
+
+### 82. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+class samp {
+    int i;
+public:
+    samp(int n) { i = n; }
+    void set_i(int n) { i = n; }
+    int get_i() { return i; }
+};
+void sqr_it(samp ob) {
+    ob.set_i(ob.get_i() * ob.get_i());
+    cout << ob.get_i() << "\n";
+}
+int main() {
+    samp a(10);
+    sqr_it(a);
+    cout << a.get_i();
+    return 0;
+}
+```
+Вывод:
+
+`10`
+
+`100`
+
+### 83. Исследуйте следующую конструкцию:
+
+```cpp
+#include <iostream>
+using namespace std;
+class cl_base {
+    int a, b;
+public:
+    int c;
+    void setab ( int i, int j ) { a = i; b = j; }
+    void getab ( int & i, int & j ) { i = a; j = b; }
+};
+class derived_1 : pablic cl_base { };
+class derived_2 : private cl_base { };
+int main ( ) {
+    derived_1 ob_1;
+    derived_2 ob_2;
+    int i, j;
+    // . . . . .
+    return 0;
+}
+```
+
+Какая из следующих инструкций правильна внутри функции main ( )?
+
+A. `ob_1.getab ( i, j );` **правильно**
+
+B. `оb_2.getab ( i, j );`
+
+C. `ob_1.c = 10;` **правильно**
+
+D.` ob_2.c = 10;`
+
+### 84. Объясните, что в следующей программе неправильно, и исправьте ее
+
+```cpp
+#include <iostream>
+using namespace std;
+class cl_1 {
+    int* p;
+public:
+    cl_1(int i);
+    ~cl_1() { delete p; }
+    friend int getval(cl_1 ob);
+};
+cl_1::cl_1(int i) {
+    p = new int;
+    if (!p) {
+        cout << "Error 1\n";
+        exit(1);
+    }
+    *p = i;
+}
+int getval(cl_1 ob) { return *ob.p; }
+int main() {
+    cl_1 a(1), b(2);
+    cout << getval(a) << " " << getval(b);
+    cout << "\n";
+    cout << getval(a) << " " << getval(b);
+    return 0;
+}
+```
+
+В фукнции `getval` создается локальный объект, который после отработки функции удаляется, а, соотвественно, отрабатывается деструктор. В деструкторе у нас удаляется значение в области памяти, на которую указывает указатель, а указатель указыает на одну и ту же область памяти в локальном объекте и объекте функции, из которой вызвали функцию. Поэтому мы выводим на экран значение области памяти, в которой ничего не лежит. 
+
+Для исправления достаточно передать ссылку на объект в функцию:
+
+```cpp
+int getval(cl_1& ob) { return *ob.p; }
+```
+
+### 85. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+class A {
+public: 
+    A ( ) { cout << "Constructor A\n"; }
+    ~A ( ) { cout << "Destructor A\n"; }
+};
+class B {
+public:
+    B ( ) { cout << "Constructor B\n"; }
+    ~B ( ) { cout << "Destructor B\n"; }
+};
+class C : public A, public B {
+public:
+    C ( ) { cout << "Constructor C\n"; }
+    ~C ( ) { cout << "Destructor C\n"; }
+};
+int main ( ) {
+    C ob;
+    return 0;
+}
+```
+
+Вывод:
+
+`Constructor A`
+
+`Constructor B`
+
+`Constructor C`
+
+`Destructor C`
+
+`Destructor B`
+
+`Destructor A`
+
+### 86. В следующей программе имеется ошибка. Исправьте ее с помощью оператора const_cast
+
+```cpp
+#include <iostream>
+using namespace std;
+void f ( const double & i )
+{
+    i = 100; // const_cast<double&> (i) = 100;
+}
+int main ( )
+{
+    double x = 98.6;
+    cout << x << endl;
+    f ( x );
+    cout << x << endl;
+    return 0;
+}
+```
+
+### 87. Ниже приведены две перегруженные функции. Покажите, как получить адрес каждой из них
+
+```cpp
+#include <iostream>
+using namespace std;
+int dif ( int a, int b ) { return a — b; }
+float dif ( float a, float b ) { return a — b; }
+int main ( ) {
+    /*
+    int (*p1) (int a, int b) = dif;
+    float (*p2) (float a, float b) = dif;
+    */
+    return 0;
+}
+```
+
+### 88. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+union bits {
+    bits ( short n );
+    void show_bits ( ) ;
+    short d;
+    unsigned char c [ sizeof ( short ) ];
+};
+bits :: bits ( short n ) { d = n; }
+void bits :: show_bits ( ) {
+    int i, j;
+    for ( j = sizeof ( short ) - 1; j >= 0; j -- ) {
+        cout << "Byte " << j << ":";
+        for( i = 128; i; i >>= 1 )
+            if ( i & c [ j ] ) cout << "1";
+            else cout << "0";
+            cout << "\n";
+    }
+}
+int main ( ) {
+    bits ob ( 5 );
+    ob.show_bits ( );
+    return 0;
+}
+```
+
+Вывод программы:
+
+`Byte 1:00000000`
+
+`Byte 0:00000101`
+
+### 89. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+template < class T >
+T & inc_value ( T & val ) {
+    ++val;
+    return val;
+}
+int main ( )
+{
+    int x = 64;
+    char c = 64;
+    x = ( int ) inc_value < int > ( x );
+    cout << x << endl;
+    c = ( char ) inc_value < char > ( c );
+    cout << c << endl;
+    printf ( "%02X", c );
+    return 0;
+}
+```
+
+Вывод:
+
+`65`
+
+`A`
+
+`41`
+
+### 90. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+int main ( ) {
+    union {
+        unsigned char bytes [ 4 ];
+        int value;
+    };
+    int i;
+    value = 128;
+    for ( i = 3; i >= 0; i -- )
+        cout << ( int ) bytes [ i ] << " ";
+    return 0;
+}
+```
+
+Вывод программы: `0 0 0 128`
+
