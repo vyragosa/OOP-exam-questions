@@ -2121,3 +2121,391 @@ int main ( ) {
 
 Вывод программы: `0 0 0 128`
 
+### 91. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+class samp {
+    int i;
+public:
+    samp ( int n ) { i = n; }
+    void set_i ( int n ) { i = n; }
+    int get_i ( ) { return i; }
+};
+    void sqr_it ( samp * ob ) {
+    ob -> set_i ( ob -> get_i ( ) * ob -> get_i ( ) );
+    cout << ob -> get_i ( ) << "\n";
+}
+int main ( ) {
+    samp a ( 10 );
+    sqr_it ( & a );
+    cout << a.get_i ( );
+    return 0;
+}
+```
+
+Вывод программы:
+
+`100`
+
+`100`
+
+### 92. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+template < class T1 >
+void PrintArray(const T1* array, const int count)
+{
+    for (int i = 0; i < count; i++)
+        cout << array[i] << " ";
+    cout << endl;
+}
+int main()
+{
+    const int aCount = 5;
+    const int bCount = 7;
+    const int cCount = 6;
+    int a[aCount] = { 1,2,3,4,5 };
+    double b[bCount] = { 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7 };
+    char c[cCount] = "HELLO";
+    cout << "Array a:" << endl;
+    PrintArray(a, aCount);
+    cout << "Array b:" << endl;
+    PrintArray(b, bCount);
+    cout << "Array c:" << endl;
+    PrintArray(c, cCount);
+    return 0;
+}
+```
+
+### 93. Дана следующая программа, переделайте все соответствующие обращения к членам класса так, чтобы в них явно присутствовал указатель this.
+
+```cpp
+#include <iostream>
+using namespace std;
+class cl_1 {
+    int a, b;
+public:
+    cl_1(int n, int m) { a = n; b = m; }
+    //cl_1(int a, int b) { this->a = a; this->b = b; }
+    int add() { return a + b; }
+    //int add() { return this->a + this->b; }
+    void show();
+};
+void cl_1::show() {
+    int t;
+    t = add();
+    cout << t << "\n";
+    //cout << this->add() << "\n";
+}
+int main() {
+    cl_1 ob(10, 14);
+    ob.show();
+    return 0;
+}
+```
+
+### 94.Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+class base {
+public:
+    base() { cout << "Constructor base\n"; }
+    ~base() { cout << "Destructor base\n"; }
+};
+class derived : public base {
+public:
+    derived() { cout << "Constructor derived\n"; }
+    ~derived() { cout << "Destructor derived\n"; }
+};
+int main() {
+    derived ob;
+    return 0;
+}
+```
+
+Вывод программы:
+
+`Constructor base`
+
+`Constructor derived`
+
+`Destructor derived`
+
+`Destructor base`
+
+### 95. Что неправильно в следующей программе ?
+
+```cpp
+#include <iostream>
+using namespace std;
+void triple(double& num);
+int main() {
+    double d = 7.0;
+    triple(&d);
+    //triple(d); необходимо передавать не по ссылке
+    cout << d;
+    return 0;
+}
+```
+
+### 96. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+union swapbytes {
+    unsigned char c[2];
+    unsigned short i;
+public:
+    swapbytes(unsigned short x);
+    void swp();
+};
+swapbytes::swapbytes(unsigned short x) { i = x; }
+void swapbytes::swp() {
+    unsigned char temp;
+    temp = с[0];
+    c[0] = c[1];
+    c[1] = temp;
+}
+int main() {
+    swapbytes ob(1);
+    ob.swp();
+    cout << ob.i;
+    return 0;
+}
+```
+
+Вывод программы:
+
+`256`
+
+### 97. Какой будет результат после отработки данной программы?
+
+```cpp
+#include <iostream>
+using namespace std;
+int rotate(int i) {
+    int x;
+    if (i & 0x80000000) x = 1;
+    else x = 0;
+    i = i << 1;
+    i += x;
+    return i;
+}
+int main() {
+    int a;
+    a = 0x80000001;
+    cout << rotate(a);
+    return 0;
+}
+```
+
+Вывод программы:
+
+`3`
+
+### 98. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+class cl_1 {
+public:
+    static int i;
+    void seti(int n) { i = n; }
+    int geti() { return i; }
+};
+int cl_1::i;
+int main() {
+    cl_1 ol, o2;
+    cl_1::i = 100;
+    cout << "ol.i: " << ol.geti() << '\n';
+    cout << "o2.i: " << o2.geti() << '\n';
+    return 0;
+}
+```
+
+Вывод программы:
+
+`ol.i: 100`
+
+`o2.i: 100`
+
+### 99. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+int rotate(int i) {
+    int x;
+    if (i & 0x80000000) x = 1;
+    else x = 0;
+    i = i << 1;
+    i += x;
+    return i;
+}
+int main() {
+    int a;
+    a = 0x80000000;
+    cout << rotate(a);
+    return 0;
+}
+```
+
+Вывод программы:
+
+`1`
+
+### 100. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+union swapbytes {
+    unsigned char c[2];
+    unsigned short i;
+public:
+    swapbytes(unsigned short x);
+    void swp();
+};
+swapbytes::swapbytes(unsigned short x) { i = x; }
+void swapbytes::swp() {
+    unsigned char temp;
+    temp = c[0];
+    c[0] = c[1];
+    c[1] = temp;
+}
+int main() {
+    swapbytes ob(256);
+    ob.swp();
+    cout << ob.i;
+    return 0;
+}
+```
+
+Вывод программы:
+
+`1`
+
+### 101. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+int main()
+{
+    unsigned char c = 0x1A;
+    c <<= 4; // умножить на 16
+    c >>= 4; // разделить на 16
+    printf("c = %02X", c);
+    return 0;
+}
+```
+
+Вывод программы:
+
+`c = 0A`
+
+### 102. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+#include <typeinfo>
+using namespace std;
+class BaseClass {
+    virtual void f() { }
+};
+class Derivedl : public BaseClass { };
+class Derived2 : public BaseClass { };
+int main() {
+    int i;
+    BaseClass* p, baseob;
+    Derivedl ob1;
+    Derived2 ob2;
+    cout << "Type - " << typeid (i).name() << endl;
+    p = &baseob;
+    cout << "Type - " << typeid (*p).name() << endl;
+    p = &ob1;
+    cout << "Type - " << typeid (*p).name() << endl;
+    p = &ob2;
+    cout << "Type - " << typeid (*p).name() << endl;
+    return 0;
+}
+```
+
+Вывод программы:
+
+`Type - int`
+
+`Type - class BaseClass`
+
+`Type - class Derivedl`
+
+`Type - class Derived2`
+
+### 103. Какой будет результат после отработки данной программы ?
+
+```cpp
+#include <iostream>
+using namespace std;
+class Base {
+public:
+    virtual void f() { }
+};
+class Derived : public Base {
+public:
+    void derived_only() {
+        cout << "It's object of class Derived\n";
+    }
+};
+int main() {
+    Base* bp, b_ob;
+    Derived* dp, d_ob;
+    bp = &b_ob;
+    dp = dynamic_cast <Derived*> (bp);
+    if (dp) dp->derived_only();
+    else cout << "Error 1\n";
+    bp = &d_ob;
+    dp = dynamic_cast <Derived*> (bp);
+    if (dp) dp->derived_only();
+    else cout << "Error 2\n";
+    return 0;
+}
+```
+
+Вывод программы:
+
+`Error 1`
+
+`It's object of class Derived`
+
+### 104. Что неправильно в следующем фрагменте ?
+
+```cpp
+#include <iostream>
+using namespace std;
+class cl1 {
+    int i, j;
+public:
+    cl1(int a, int b) { i = a; j = b; }
+};
+class cl2 {
+//class cl2 :public cl1 {
+    int i, j;
+public:
+    cl2(int a, int b) { i = a; j = b; }
+    //cl2(int a, int b) :cl1(a, b) {}
+};
+int main() {
+    cll x(10, 20);
+    cl2 y(0, 0);
+    x = y;
+    . . . . .
+}
+```
